@@ -68,7 +68,7 @@ export default function Home() {
             .writeText(shareUrl)
             .then(() => {
                 setToastVisible(true);
-                setTimeout(() => setToastVisible(false), 1000);
+                setTimeout(() => setToastVisible(false), 3000);
             })
             .catch((err) => {
                 console.error("클립보드 복사 실패:", err);
@@ -113,6 +113,17 @@ export default function Home() {
                     </span>
                 </div>
 
+                {/* 토스트 */}
+                {toastVisible && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <div className="bg-black bg-opacity-80 text-white px-6 py-4 rounded-xl text-center pointer-events-none">
+                            <span className="regular" style={{ fontSize: 15 }}>
+                                링크가 복사되었습니다!
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 <button
                     className="btn-black"
                     onClick={handleShare}
@@ -123,16 +134,7 @@ export default function Home() {
                     </span>
                 </button>
 
-                {/* 토스트 */}
-                {toastVisible && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center">
-                        <div className="bg-black bg-opacity-80 text-white px-6 py-4 rounded-xl text-center pointer-events-none">
-                            <span className="light" style={{ fontSize: 15 }}>
-                                링크가 복사되었습니다!
-                            </span>
-                        </div>
-                    </div>
-                )}
+
 
                 <button
                     className="btn-white"
