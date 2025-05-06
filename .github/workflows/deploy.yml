@@ -39,23 +39,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH Key
-        run: |
-          echo "${{ secrets.PEM_KEY }}" > private-key.pem
-          chmod 600 private-key.pem
-
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          key_path: private-key.pem
+          key: ${{ secrets.PEM_KEY }}
           script: |
-            cd ~/wannago-deploy || mkdir ~/wannago-deploy && cd ~/wannago-deploy
+            cd ~/tst-fe-deploy || mkdir ~/tst-fe-deploy && cd ~/tst-fe-deploy
 
-            # 🔥 기존 컨테이너 중복 방지용 정리
-            docker stop wannago_fe || true
-            docker rm wannago_fe || true
+            # 🔥 기존 컨테이너 중복 방지용 정리 (tst-fe-image 형식에 맞게 수정)
+            docker stop tst-fe || true
+            docker rm tst-fe || true
             docker stop nginx || true
             docker rm nginx || true
             docker stop goaccess || true
