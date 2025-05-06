@@ -41,8 +41,8 @@ jobs:
     steps:
       - name: Set up SSH Key
         run: |
-          echo "${{ secrets.PEM_KEY }}" | base64 --decode > private-key.pem
-          chmod 600 private-key.pem
+          echo "${{ secrets.PEM_KEY }}" > private-key.pem
+          chmod 600 private-key.pem          
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
