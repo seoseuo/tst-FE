@@ -2,14 +2,12 @@
 
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { fetchTestDetail, startTest } from "../../lib/api";
 import Header from "../../component/main-header";
 import { Test } from "../../types/test";
 
-
-
-export default function Home() {
+const TestComponent = () => {
   const searchParams = useSearchParams();
   const testId = searchParams.get('testId');
   const [test, setTest] = useState<Test>();
@@ -23,7 +21,7 @@ export default function Home() {
           const testData = await fetchTestDetail(Number(testId));
           console.log('테스트 상세 정보:', testData);
           setTest(testData);
-          localStorage.setItem("testId",testData.testId);
+          localStorage.setItem("testId", testData.testId);
         } catch (err) {
           console.error('테스트 상세 정보 가져오기 실패:', err);
         }
@@ -40,21 +38,17 @@ export default function Home() {
       return;
     }
     // 테스트 시작 요청
-    // localStorage에 return 받은 userCode 저장하기
     if (test?.testId !== undefined) {
       try {
         const startData = await startTest(test.testId, userCodeInput.value);
         console.log("테스트 시작 startData :", startData);
         console.log("테스트 시작 startData.userCode :", startData.userCode);
-        // 질문 총 개수
         console.log("테스트 시작 startData.questionId :", startData.questionId);
-        
-        localStorage.setItem("userCode", startData.userCode);   
-        
-        // 질문 총 개수
-        localStorage.setItem("size", startData.questionId);      
-      
-      router.push(`/question`);
+
+        localStorage.setItem("userCode", startData.userCode);
+        localStorage.setItem("size", startData.questionId);
+
+        router.push(`/question`);
       } catch (error) {
         console.error("테스트 시작 실패", error);
       }
@@ -65,7 +59,7 @@ export default function Home() {
 
   return (
     <div>
-      <Header text="" icon="back" parent="/"></Header>
+      <Header text="" icon="back" parent="/" />
 
       <div className="get-test-container">
         <div>
@@ -82,7 +76,7 @@ export default function Home() {
           <span className="light" style={{ fontSize: '15px' }}>
             {test?.testDetail}</span>
         </div>
-        
+
         <Image
           className="test-img-2"
           src={`/s3/${test?.testImg2}`}
@@ -108,4 +102,10 @@ export default function Home() {
   );
 }
 
-
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TestComponent />
+    </Suspense>
+  );
+}
