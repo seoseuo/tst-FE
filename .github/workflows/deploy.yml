@@ -6,124 +6,129 @@ on:
       - master
 
 jobs:
+  # Build Job: Docker 이미지 빌드 및 푸시
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Create .env.local
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Create .env.local file from Secrets
         run: |
           echo "NEXT_PUBLIC_SPRINGBOOT_URL=${{ secrets.NEXT_PUBLIC_SPRINGBOOT_URL }}" >> .env.local
-          echo "NEXT_PUBLIC_S3_URL=${{ secrets.NEXT_PUBLIC_S3_URL }}" >> .env.local
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/login-action@v2
+          echo "NEXT_PUBLIC_S3_URL=${{ secrets.NEXT_PUBLIC_S3_URL }}" >> .env.local          
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build & Push
+
+      - name: Build and Push Docker Image
         run: |
           docker build --no-cache -t seuo/tst-fe-image:latest .
           docker push seuo/tst-fe-image:latest
 
+  # Deploy Job: 빌드 후 배포
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Load SSH key and start agent
+      - name: Set up SSH Key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PEM_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
+          echo "${{ secrets.PEM_KEY }}" > private-key.pem
+          chmod 600 private-key.pem
 
-      - name: Disable strict host key checking
-        run: |
-          printf "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
-
-      - name: Deploy via SSH
-        run: |
-          ssh ubuntu@${{ secrets.SERVER_HOST }} << 'EOF'
-            set -e
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key_path: private-key.pem
+          script: |
             cd ~/wannago-deploy || mkdir ~/wannago-deploy && cd ~/wannago-deploy
 
-            # Clean up old containers
-            docker stop tst-fe || true
-            docker rm tst-fe || true
+            # 🔥 기존 컨테이너 중복 방지용 정리
+            docker stop wannago_fe || true
+            docker rm wannago_fe || true
             docker stop nginx || true
             docker rm nginx || true
             docker stop goaccess || true
             docker rm goaccess || true
 
-            # Pull latest image
+            # 최신 프론트엔드 이미지 pull
             docker pull seuo/tst-fe-image:latest
 
-            # Write docker-compose.yml
-            cat > docker-compose.yml << 'DCEOF'
-version: "3.8"
-services:
-  frontend:
-    container_name: tst-fe
-    image: seuo/tst-fe-image:latest
-    restart: always
-    expose:
-      - "3000"
-    networks:
-      - frontend-net
+            # 🧾 docker-compose.yml 생성
+            cat <<EOF > docker-compose.yml
+            version: "3.8"
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx-logs:/var/log/nginx
-    depends_on:
-      - frontend
-    networks:
-      - frontend-net
+            services:
+              frontend:
+                container_name: tst-fe
+                image: seuo/tst-fe-image:latest
+                restart: always
+                expose:
+                  - "3000"
+                networks:
+                  - frontend-net
 
-  goaccess:
-    image: allinurl/goaccess
-    container_name: goaccess
-    environment:
-      - GOACCESS_ACCESS_LOG=/var/log/nginx/access.log
-      - GOACCESS_OUTPUT_FILE=/usr/share/nginx/html/report.html
-    ports:
-      - "7890:7890"
-    volumes:
-      - ./nginx-logs:/var/log/nginx
-      - ./goaccess-report:/usr/share/nginx/html
-    networks:
-      - frontend-net
-    depends_on:
-      - nginx
+              nginx:
+                image: nginx:latest
+                container_name: nginx
+                ports:
+                  - "80:80"
+                volumes:
+                  - ./nginx.conf:/etc/nginx/nginx.conf:ro
+                  - ./nginx-logs:/var/log/nginx
+                depends_on:
+                  - frontend
+                networks:
+                  - frontend-net
 
-networks:
-  frontend-net:
-    driver: bridge
-DCEOF
+              goaccess:
+                image: allinurl/goaccess
+                container_name: goaccess
+                environment:
+                  - GOACCESS_ACCESS_LOG=/var/log/nginx/access.log
+                  - GOACCESS_OUTPUT_FILE=/usr/share/nginx/html/report.html
+                ports:
+                  - "7890:7890"  # GoAccess 대시보드 포트
+                volumes:
+                  - ./nginx-logs:/var/log/nginx
+                  - ./goaccess-report:/usr/share/nginx/html
+                networks:
+                  - frontend-net
+                depends_on:
+                  - nginx
 
-            # Write nginx.conf
-            cat > nginx.conf << 'NGEF'
-events {}
-http {
-  access_log /var/log/nginx/access.log;
-  server {
-    listen 80;
-    location / {
-      proxy_pass http://frontend:3000;
-      proxy_set_header Host $host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
-    }
-  }
-}
-NGEF
+            networks:
+              frontend-net:
+                driver: bridge
+            EOF
+
+            # 🛠️ nginx.conf 생성 (Next.js 3000 포트로 프록시)
+            cat <<EOF > nginx.conf
+            events {}
+            http {
+              access_log /var/log/nginx/access.log;
+              server {
+                listen 80;
+                location / {
+                  proxy_pass http://frontend:3000;
+                  proxy_set_header Host \$host;
+                  proxy_set_header X-Real-IP \$remote_addr;
+                  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto \$scheme;
+                }
+              }
+            }
+            EOF
 
             docker compose down
             docker compose up -d
-          EOF
