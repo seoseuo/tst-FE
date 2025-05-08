@@ -12,13 +12,13 @@ interface TestListProps {
 
 export default function TestList({ testList }: TestListProps) {
     const router = useRouter();
-    const FEURL = process.env.NEXT_PUBLIC_NEXT_URL;
+    //const FEURL = process.env.NEXT_PUBLIC_NEXT_URL;
     
     const handleTestClick = async (test: Test) => {        
         router.push(`/test?testId=${test.testId}`);
         
         // 추후 링크 공유 용
-        localStorage.setItem('shareUrl', `${FEURL}/test?testId=${test.testId}`);        
+        localStorage.setItem('shareUrl', `https://tessbro.site/test?testId=${test.testId}`);        
     };
 
     return (
