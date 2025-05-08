@@ -80,9 +80,11 @@ body {
   gap: 20px;
 }
 
+.white-space {
+  white-space: pre-wrap;
+}
 
 .get-test-detail-box {
-  
   border: 1px black solid;
   border-radius: 16px;
   width: 296px;
