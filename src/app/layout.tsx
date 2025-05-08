@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "테스형",
   description: "자기사유 테스트 플랫폼",
   icons: {
-    icon: "/logo-icon.ico",
+    icon: "/favicon.ico",
   },
   openGraph: {
     title: "테스형 - 자기사유 테스트 플랫폼",
