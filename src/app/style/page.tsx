@@ -50,19 +50,19 @@ export default function Home() {
             return;
         }
 
-        // // Web Share API 지원 시
-        // if (typeof navigator.share !== "undefined") {
-        //     navigator
-        //         .share({
-        //             title: "테스트 결과 공유",
-        //             text: "나의 테스트 결과를 공유해보세요!",
-        //             url: shareUrl,
-        //         })
-        //         .catch((err) => {
-        //             console.error("공유 실패:", err);
-        //         });
-        // } else {
-        // Web Share API 미지원 → 클립보드 복사 + 모달
+        // Web Share API 지원 시
+        if (typeof navigator.share !== "undefined") {
+            navigator
+                .share({
+                    title: "테스트 공유",
+                    text: "친구에게 테스트를 공유해보아요!",
+                    url: shareUrl,
+                })
+                .catch((err) => {
+                    console.error("공유 실패:", err);
+                });
+        } else {
+        //Web Share API 미지원 → 클립보드 복사 + 모달
 
         navigator.clipboard
             .writeText(shareUrl)
@@ -74,7 +74,7 @@ export default function Home() {
                 console.error("클립보드 복사 실패:", err);
                 alert("공유 URL 복사에 실패했습니다.");
             });
-        //}
+        }
     };
 
     return (
