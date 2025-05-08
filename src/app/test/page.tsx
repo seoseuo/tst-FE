@@ -8,10 +8,12 @@ import Header from "../../component/main-header";
 import { Test } from "../../types/test";
 
 const TestComponent = () => {
+  
   const searchParams = useSearchParams();
   const testId = searchParams.get('testId');
   const [test, setTest] = useState<Test>();
   const [showWarning, setShowWarning] = useState(false);
+  
   const router = useRouter();
 
   useEffect(() => {
@@ -21,7 +23,8 @@ const TestComponent = () => {
           const testData = await fetchTestDetail(Number(testId));
           console.log('테스트 상세 정보:', testData);
           setTest(testData);
-          localStorage.setItem("testId", testData.testId);
+          localStorage.setItem("testId", testData.testId);          
+          
         } catch (err) {
           console.error('테스트 상세 정보 가져오기 실패:', err);
         }
@@ -72,10 +75,16 @@ const TestComponent = () => {
           </span>
         </div>
 
-        <div className="get-test-detail-box">
-          <span className="light" style={{ fontSize: '15px' }}>
-            {test?.testDetail}</span>
+        <div className="get-test-detail-box white-space">
+          <div
+            className="light white-space"
+            style={{ fontSize: '15px'}}
+          >
+            {test?.testDetail.replace(/\\n/g, '\n')}
+            
+          </div>
         </div>
+
 
         <Image
           className="test-img-2"
