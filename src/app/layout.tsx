@@ -5,6 +5,32 @@ import Footer from "../component/footer";
 export const metadata: Metadata = {
   title: "테스형",
   description: "자기사유 테스트 플랫폼",
+  icons: {
+    icon: "/logo-icon.ico",
+  },
+  openGraph: {
+    title: "테스형 - 자기사유 테스트 플랫폼",
+    description: "그대는 그 뭐냐 그거다...",
+    url: "https://tessbro.site",
+    siteName: "테스형",
+    images: [
+      {
+        url: "/preview.png", // public 폴더에 이미지 두고 절대 경로로
+        width: 1200,
+        height: 630,
+        alt: "테스형 - 자기사유 테스트 플랫폼",
+      },
+    ],
+    type: "website",
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "테스형 - 자기사유 테스트 플랫폼",
+    description: "쉽고 빠르게 자기사유를 테스트해보세요!",
+    images: ["https://yourdomain.com/og-image.png"],
+    site: "@your_twitter_id", // 없으면 생략해도 OK
+  },
 };
 
 export default function RootLayout({
@@ -13,10 +39,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <head>
-        {/* 뷰포트 메타 태그 추가 */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
       </head>
       <body>
         {children}
