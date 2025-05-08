@@ -5,6 +5,9 @@ import Footer from "../component/footer";
 export const metadata: Metadata = {
   title: "테스형",
   description: "자기사유 테스트 플랫폼",
+  icons: {
+    icon: "/logo-icon.ico",
+  },
   openGraph: {
     title: "테스형 - 자기사유 테스트 플랫폼",
     description: "그대는 그 뭐냐 그거다...",
@@ -12,7 +15,7 @@ export const metadata: Metadata = {
     siteName: "테스형",
     images: [
       {
-        url: "https://tessbro.site/preview.png",
+        url: "/preview.png", // public 폴더에 이미지 두고 절대 경로로
         width: 1200,
         height: 630,
         alt: "테스형 - 자기사유 테스트 플랫폼",
@@ -25,8 +28,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "테스형 - 자기사유 테스트 플랫폼",
     description: "그대는 그 뭐냐 그거다...",
-    images: ["https://tessbro.site/preview.png"],
-    site: "https://tessbro.site",
+    images: ["/preview.png"],
+    site: "https://tessbro.site", // 없으면 생략해도 OK
   },
 };
 
