@@ -6,7 +6,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { fetchTestDetail, startTest } from "../../lib/api";
 import Header from "../../component/main-header";
 import { Test } from "../../types/test";
-import { Head } from "next/document";  // Head 컴포넌트 추가
+import Head from "next/head";  // next/head 임포트 수정
 
 const TestComponent = () => {
   
@@ -25,7 +25,6 @@ const TestComponent = () => {
           console.log('테스트 상세 정보:', testData);
           setTest(testData);
           localStorage.setItem("testId", testData.testId);          
-          
         } catch (err) {
           console.error('테스트 상세 정보 가져오기 실패:', err);
         }
@@ -63,6 +62,7 @@ const TestComponent = () => {
 
   return (
     <div>
+      {/* Head 컴포넌트를 next/head로 수정 */}
       <Head>
         <meta property="og:title" content={test?.testName || "테스트"} />
         <meta property="og:description" content={test?.testDes || "테스트 설명"} />
@@ -90,7 +90,6 @@ const TestComponent = () => {
             style={{ fontSize: '15px'}}
           >
             {test?.testDetail.replace(/\\n/g, '\n')}
-            
           </div>
         </div>
 
