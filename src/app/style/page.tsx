@@ -15,6 +15,12 @@ export default function Home() {
     const [showUserCode, setShowUserCode] = useState("");
     const [toastVisible, setToastVisible] = useState(false);
 
+    // 🔹 isPC 함수를 useEffect 밖으로 이동
+    const isPC = () => {
+        const ua = navigator.userAgent;
+        return !/Mobi|Android|iPhone|iPad|iPod/.test(ua);
+    };
+
     useEffect(() => {
         const testId = localStorage.getItem("testId");
         const userCode = localStorage.getItem("userCode");
@@ -43,15 +49,9 @@ export default function Home() {
         })();
     }, []);
 
-
     const handleShare = () => {
-        if (!shareUrl) {
-            alert("공유할 URL이 없습니다.");
-            return;
-        }
-
-        // Web Share API 지원 시
-        if (typeof navigator.share !== "undefined") {
+        if (!isPC() && typeof navigator.share !== "undefined") {
+            // 모바일 + Web Share API 지원
             navigator
                 .share({
                     title: "테스트 공유",
@@ -62,18 +62,17 @@ export default function Home() {
                     console.error("공유 실패:", err);
                 });
         } else {
-        //Web Share API 미지원 → 클립보드 복사 + 모달
-
-        navigator.clipboard
-            .writeText(shareUrl)
-            .then(() => {
-                setToastVisible(true);
-                setTimeout(() => setToastVisible(false), 3000);
-            })
-            .catch((err) => {
-                console.error("클립보드 복사 실패:", err);
-                alert("공유 URL 복사에 실패했습니다.");
-            });
+            // PC 또는 Web Share API 미지원
+            navigator.clipboard
+                .writeText(shareUrl)
+                .then(() => {
+                    setToastVisible(true);
+                    setTimeout(() => setToastVisible(false), 3000);
+                })
+                .catch((err) => {
+                    console.error("클립보드 복사 실패:", err);
+                    alert("공유 URL 복사에 실패했습니다.");
+                });
         }
     };
 
@@ -134,8 +133,6 @@ export default function Home() {
                     </span>
                 </button>
 
-
-
                 <button
                     className="btn-white"
                     onClick={() => router.push("/")}
@@ -148,9 +145,6 @@ export default function Home() {
             </div>
 
             <div style={{ marginTop: 23, height: 2, backgroundColor: "#E0E0E0" }} />
-
-
-
         </div>
     );
 }
