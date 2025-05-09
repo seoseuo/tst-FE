@@ -6,6 +6,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { fetchTestDetail, startTest } from "../../lib/api";
 import Header from "../../component/main-header";
 import { Test } from "../../types/test";
+import { Head } from "next/document";  // Head 컴포넌트 추가
 
 const TestComponent = () => {
   
@@ -62,6 +63,14 @@ const TestComponent = () => {
 
   return (
     <div>
+      <Head>
+        <meta property="og:title" content={test?.testName || "테스트"} />
+        <meta property="og:description" content={test?.testDes || "테스트 설명"} />
+        <meta property="og:image" content={test?.testImg1 ? `/s3/${test?.testImg1}` : "/preview.png"} />
+        <meta property="og:url" content={`https://tessbro.site/test?testId=${testId}`} />
+        <meta property="og:type" content="website" />
+      </Head>
+
       <Header text="" icon="back" parent="/" />
 
       <div className="get-test-container">
@@ -84,7 +93,6 @@ const TestComponent = () => {
             
           </div>
         </div>
-
 
         <Image
           className="test-img-2"
