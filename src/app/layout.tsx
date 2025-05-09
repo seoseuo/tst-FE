@@ -1,6 +1,9 @@
+// app/layout.tsx
+
 import type { Metadata } from "next";
 import "./globals.css";
 import Footer from "../component/footer";
+import Script from "next/script";  // next/script 불러오기
 
 export const metadata: Metadata = {
   title: "테스형",
@@ -40,6 +43,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        {/* 구글 애드센스 스크립트 */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6911364226079058"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
       <body>
         {children}
         <Footer />
