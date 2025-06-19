@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { loginCheck } from '../lib/api';
 
 // Header 컴포넌트
 export default function Header({ text, icon, parent }: { text: string; icon: string, parent?: string }) {
@@ -12,7 +11,10 @@ export default function Header({ text, icon, parent }: { text: string; icon: str
 
 
   useEffect(() => {
-    loginCheck().then((isLogin) => setIsLogin(isLogin));
+    const cookieString = document.cookie;
+    const match = cookieString.match(/(^|;)\\s*token=([^;]+)/);
+    const token = match ? match[2] : null;
+    setIsLogin(!!token);
   }, []);
 
   const router = useRouter();
