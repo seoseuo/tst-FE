@@ -3,6 +3,17 @@ import { SelectedUtil } from "../types/selectedUtil";
 
 const BASE_URL = '/api/tests'; // next.config.js rewrites로 인해 실제로는 Spring Boot로 프록시됨
 
+// 로그인 버튼을 보여주기 위해 로그인 여부 판단
+// JWT 토큰이 없다 -> 로그인 하지 않았다고 판단
+export async function loginCheck() {
+  const cookieStore = cookies();
+  const token = cookieStore.get('token')?.value;
+  if (!token) return false;
+  else return true;
+}
+
+  
+
 // 테스트 목록 조회
 export async function fetchTestList() {
   const res = await fetch(`${BASE_URL}`);
