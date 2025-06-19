@@ -7,5 +7,6 @@ export interface Test {
     testImg1: string;
     testImg2: string;
     isDelete: number;
+    adminAllow: number;
   }
   

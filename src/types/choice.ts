@@ -1,9 +1,9 @@
+import { Question } from "./question";
+
 export interface Choice {
   choiceId: number;
-  questionId: number;
-  testId: number;
+  questionDTO: Question;
   choiceContent: string;
-  styleId1: number;
-  styleId2: number;
+  styleId: number;
   isDelete: number;
 }

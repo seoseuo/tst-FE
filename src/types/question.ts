@@ -1,6 +1,8 @@
+import { Test } from "./test";
+
 export interface Question {
   questionId: number;
-  testId: number;
+  testDTO: Test;
   questionContent: string;
   isDelete: number;
 }
