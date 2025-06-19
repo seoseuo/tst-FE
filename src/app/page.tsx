@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div>
-      <Header text="어 형이야~ 테스트 하고 가~ㅋㅋ" icon="logo" parent="/" />
+      <Header text="자기사유 테스트 플랫폼 테스형" icon="logo" parent="/" />
       <TestList testList={testList} />
     </div>
   );
